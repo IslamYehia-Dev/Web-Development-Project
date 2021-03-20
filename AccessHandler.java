@@ -9,6 +9,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import DB.User;
+import java.util.List;
+import java.util.Vector;
 /**
  *
  * @author Al Badr
@@ -108,5 +110,42 @@ return 0;
     else{
     return 0;
     }
+    }
+    public static Vector<User> listUsers(){
+        ResultSet result;
+        Vector <User> users = new Vector<>();
+        try{
+            PreparedStatement pst = DB.DataBaseConnector.connection.prepareStatement("select id,uname,email,birthday,job,creditlimit,address from users where type=false");
+            result=pst.executeQuery();
+            while(result.next()){
+                User user = new User();
+                user.id = result.getInt(1);
+                user.uname = result.getString(2);
+                user.email = result.getString(3);
+                user.birthday = result.getString(4);
+                user.job = result.getString(5);
+                user.credit_Limit = result.getDouble(6);
+                user.address=result.getString(7);
+                users.add(user);
+            }
+        }
+        catch(SQLException e){
+        e.printStackTrace();
+        }
+    return users;
+    }
+    public static int deleteUser(String userName){
+    
+        ResultSet result;
+        int deleteStatus=0;
+        try{
+            PreparedStatement pst = DB.DataBaseConnector.connection.prepareStatement("delete from users where uname = ?");
+            pst.setString(1, userName);
+            deleteStatus = pst.executeUpdate();
+        }
+        catch(SQLException e){
+        e.printStackTrace();
+        }
+    return deleteStatus;
     }
 }
