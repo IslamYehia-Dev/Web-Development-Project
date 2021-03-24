@@ -5,9 +5,8 @@
 <%
     try {
         Statement smt = com.db.dbconnection.con.createStatement();
-        String Find = "iphone12";
-        //request.getParameter("find");
-        String sql = "select * from item where name='" + Find + "'";
+        String Find =request.getParameter("find");
+        String sql = "select * from item where name = '"+Find+"';";
         ResultSet item = smt.executeQuery(sql);
 
         while (item.next()) {
