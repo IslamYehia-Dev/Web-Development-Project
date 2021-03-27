@@ -17,7 +17,7 @@ import javax.servlet.*;
 public class DataBaseConnector implements ServletContextListener {
       private final String url = "jdbc:postgresql:souq_web";
     private final String user = "postgres";
-    private final String password = "lilhack";
+    private final String password = "new";
 
     public static Connection connection = null;
     public static PreparedStatement preparedStatment = null;
