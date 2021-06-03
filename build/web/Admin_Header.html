@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    nav{
+    text-align: center;
+    margin-top: 0;
+    background-color:#23463f;
+    padding: 25px;
+    }
+nav a {
+    text-decoration: none;
+    margin-right: 50px;
+    font-size: xx-large;
+    color:#277582;
+    font-weight: bolder;
+    }
+
+ul li{
+    display: inline-block;
+    position: relative;
+    line-height: 21px;
+    text-align: left;
+    }
+
+ul li a:hover{
+    color: rgb(255, 255, 255);
+    }
+ul li ul.dropdown{
+    min-width: 50%; 
+    background-color:#000000;
+    display: none;
+    position: absolute;
+    z-index: 999;
+    left: 0;
+}
+ul li:hover ul.dropdown{
+    display: block;	
+}
+ul li ul.dropdown li{
+    display: block;
+}
+.arrow{
+    width:20px;
+    height:20px;
+    
+
+    
+}
+</style>
+</head>
+<body>
+
+    <nav>
+    
+    <ul>
+       <li>        <a href="Admin_Customer.jsp">Manage Customers</a>
+       </li>
+        <li>
+            <a href="">Manage Products<img src="https://image.flaticon.com/icons/png/512/60/60995.png" class="arrow"> </a>
+            <ul class="dropdown">
+                <li><a href="editprods.jsp"><br> Edit Product</a></li>
+                <li><a href="addProduct.jsp"><br> Add Product <br></a></li><br>
+               
+                
+            </ul>
+        </li>
+
+        <li>
+            <a href="vieworders.jsp">Orders History</a>
+
+        </li>
+      </ul>
+    </nav>
+
+
+
+
+</body>
+</html>
