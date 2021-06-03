@@ -26,11 +26,16 @@ public class removefromcart extends HttpServlet {
         int itemid = Integer.parseInt(req.getParameter("itemid"));
         HttpSession hSes = req.getSession();
         List<Integer> productsCart = new ArrayList<>();
-        if(hSes.getAttribute("cart")!=null)
-        {
-             productsCart = (List<Integer>)hSes.getValue("cart");
-             productsCart.remove(productsCart.indexOf(itemid));
-             hSes.setAttribute("cart", productsCart);
+        if (hSes.getAttribute("cart") != null) {
+            productsCart = (List<Integer>) hSes.getAttribute("cart");
+            productsCart.remove(productsCart.get(productsCart.indexOf(itemid)));
+            if (productsCart.size() == 0) {
+                hSes.removeAttribute("cart");
+
+            } else {
+                hSes.setAttribute("cart", productsCart);
+
+            }
         }
         resp.sendRedirect("/OnlineOrder/viewcart.jsp");
 

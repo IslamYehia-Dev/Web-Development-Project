@@ -25,6 +25,22 @@
         <servlet-name>checkout</servlet-name>
         <servlet-class>proj.checkout</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>Admin_Page</servlet-name>
+        <servlet-class>proj.Admin_Page</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>logout</servlet-name>
+        <servlet-class>proj.logout</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>addreviewtodb</servlet-name>
+        <servlet-class>proj.addreviewtodb</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>editState</servlet-name>
+        <servlet-class>proj.editState</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>addtocart</servlet-name>
         <url-pattern>/addtocart</url-pattern>
@@ -44,6 +60,22 @@
     <servlet-mapping>
         <servlet-name>checkout</servlet-name>
         <url-pattern>/checkout</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Admin_Page</servlet-name>
+        <url-pattern>/Admin_Page</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>logout</servlet-name>
+        <url-pattern>/logout</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>addreviewtodb</servlet-name>
+        <url-pattern>/addreviewtodb</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>editState</servlet-name>
+        <url-pattern>/editState</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
