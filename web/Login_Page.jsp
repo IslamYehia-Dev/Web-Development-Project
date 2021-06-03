@@ -4,15 +4,32 @@
     Author     : Al Badr
 --%>
 
+<%@page import="proj.*"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="DB.DataBaseConnector"%>
-<%@page import="DB.AccessHandler"%>
+
 <!DOCTYPE html>
+<%@include file="Main_Header.html" %>
 <html>
+    <head>    
+        <title>Login Form</title>    
+        <link rel="stylesheet" type="text/css" href="login.css">    
+
+    </head> 
+    <style>
+        .Logo{
+            height: 87px;
+        }
+
+        .LogoDiv{
+            position:absolute;
+            top:0px;
+            left:0px;
+        }
+    </style>
+
     <%
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        boolean invalidLogin = false;
         boolean userLogin = false;
         boolean adminLogin = false;
         session = request.getSession(false);
@@ -23,15 +40,27 @@
 
     %>
     <body>
-        <form action="Login_Page.jsp" method="GET">
-            <label for="User Name">User Name</label><br>
-            <input type="text" name="username"><br>
-            <label for="password">Password</label><br>
-            <input type="password" name="password"><br>
-            <input type="submit" value="Login">
-
-        </form>
-        <%            if (invalidLogin) {
+        <div class="LogoDiv">
+            <img src="https://storage.tbcpay.ge/serviceimages/8466a41b-31b7-4a6d-b4d8-681c574a2ac3.jpg" class="Logo">
+        </div>        
+        <h2>Login Page</h2><br>    
+        <div class="login">    
+            <form id="login" method="POST" action="Login_Page.jsp">    
+                <label><b>User Name     
+                    </b>    
+                </label>    
+                <input type="text" name="username" id="Uname" placeholder="Username">    
+                <br><br>    
+                <label><b>Password     
+                    </b>    
+                </label>    
+                <input type="Password" name="password" id="Pass" placeholder="Password">    
+                <br><br>    
+                <input type="submit" name="log" id="log" value="Login">       
+                <br><br>    
+            </form>     
+        </div>    
+        <%            if (session.getAttribute("invalidLogin")!=null) {
         %>
         <h2>Wrong username or password, please re-enter your credentials</h2>
         <%
@@ -40,24 +69,22 @@
     </body>
     <%                if (username != null && !username.isEmpty()) {
                 if (password != null && !password.isEmpty()) {
-                    loginStatus = AccessHandler.verifyLogin(username, password);
+                    User user = new User();
+                    loginStatus = AccessHandler.verifyLogin(username, password, user);
                     if (loginStatus == 1) {
                         session.setAttribute("successfulLogin", "true");
                         session.setAttribute("usertype", "user");
-                        out.println("successful user login");
-                        //Go to surfing products here
-                        //response.sendRedirect("");
-
+                        session.setAttribute("userinfo", user);
+                        out.println("successful user login for" + user.id);
+                        response.sendRedirect("viewitem.jsp");
+ 
                     } else if (loginStatus == -1) {
                         session.setAttribute("successfulLogin", "true");
                         session.setAttribute("usertype", "admin");
                         out.println("successful admin login");
-                        //Go to admin page here
-                        //response.sendRedirect("");
+                        response.sendRedirect("Admin_Page");
                     } else {
-                        invalidLogin=true;
-                        out.println("Wrong credentials");
-                        
+                         session.setAttribute("invalidLogin", true);
                     }
                 }
             }
@@ -65,12 +92,16 @@
         } else {
 
             if (session.getAttribute("successfulLogin").equals("true")) {
-                out.println("You Are already logged in");
-                // Go to home page again
-                // response.sendRedirect("");
+                if (loginStatus == -1) {
+                    response.sendRedirect("Admin_Page");
+                } else {
+                    response.sendRedirect("viewitem.jsp");
+                }
+
             }
         }
 
 
     %>
 </html>
+<%@include file="Main_Footer.html" %>

@@ -4,43 +4,115 @@
     Author     : Al Badr
 --%>
 
-<%@page import="DB.AccessHandler"%>
+<%@page import="proj.*"%>
 <%@page import="java.util.Vector"%>
-<%@page import="DB.User"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<html>
-    <body>
-        <h1>Current Users</h1>
 
-            <%
-                Vector<User> users = new Vector<>();
-                int deleteStatus = 0;
-                String username = request.getParameter("username");
-                if (username != null && !username.isEmpty()) {
-                    AccessHandler.deleteUser(username);
-                }
-                users = AccessHandler.listUsers();
-                for (User customer : users) {
-            %>
-           
-     <form action="Admin_Customer.jsp?username=<%out.println(customer.uname);%>" method="POST">
-        <span style="display: inline-block; border-style: solid; border-color: black;">
-            <h2 style="display: inline; margin-right: 10px;">--Id : <% out.println(customer.id);%> </h2>
-            <h2 style="display: inline; margin-right: 10px;">--User Name : <% out.println(customer.uname);%></h2>
-            <h2 style="display: inline; margin-right: 10px;" >--E-mail : <% out.println(customer.email);%> </h2><br>
-            <h2 style="display:inline; margin-right: 10px;">--Birthday : <% out.println(customer.birthday);%></h2>
-            <h2 style="display: inline; margin-right: 10px;">--Job : <% out.println(customer.job);%> </h2><br>
-            <h2 style="display: inline; margin-right: 10px;">--Current Credit : <% out.println(customer.credit_Limit);%> </h2>
-            <h2 style="display: inline; margin-right: 10px;">--Address : <% out.println(customer.address);%> </h2>
-        </span>
-        <input type="submit" value="Delete">
-    </form><br>
-       
-        
-        <%
-            }
+<%@include file="Admin_Header.html"%>
+<head>
+    <style>
+        table{
 
-        %>
-    
-</body>
-</html>
+            margin-left: 120px;
+            background-color: #277582;
+        }
+        label {
+            font-weight: bolder;
+            color: white;
+            width: 300px;
+            display: inline-block;
+        }
+
+        table,
+        th,
+        td {
+            font-weight: bolder;
+            border: 1px solid black;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        nav{
+            text-align: center;
+            margin-top: 0;
+            background-color:#23463f;
+            padding: 25px;
+
+        }
+
+        p{
+            display: inline-block;
+            width: 100px;
+            color: black;
+        }
+        input{
+            width: 100px;
+            height: 20px;  
+            border: none;  
+            border-radius: 17px;  
+            color: #23463f;
+            background-color: #277582;
+            font-size: medium;
+            font-weight: bolder;
+        }
+    </style>
+</head>
+
+<%
+    int validLogin = 0;
+
+    validLogin = AccessHandler.checkStatus(session);
+    if (validLogin == -1) {
+%>
+<h1>Current Users :</h1>
+
+<%
+    Vector<User> users = new Vector<>();
+    int deleteStatus = 0;
+    String username = request.getParameter("username");
+    if (username != null && !username.isEmpty()) {
+        deleteStatus = AccessHandler.deleteUser(username);
+    }
+    users = AccessHandler.listUsers();
+    for (User customer : users) {
+%>
+<nav>
+    <form action="Admin_Customer.jsp" method="POST">
+
+        <table border="1" style="width: 80%">
+            <tr>
+                <th>ID  : <%=customer.id%></th>
+                <th>Name : <%=customer.uname%></th>
+            </tr>
+            <tr>
+                <th>Job : <%=customer.job%> </th>
+                <th>Email : <%=customer.email%></th>
+            </tr>
+            <tr>
+                <th>CreditLimit : <%=customer.credit_Limit%> </th>
+                <th>Address : <%=customer.address%></th>
+            </tr>
+            <tr>
+                <th>Birthday : <%=customer.birthday%> </th>
+                <input type="hidden" name="username"  value="<%=customer.uname %>">
+
+                <th><input type="submit" value="Delete">
+                    <a href="EditProfile.jsp?oldUsername=<%out.println(customer.uname);%>" style=" font-weight: bolder; color: #23463f; height: 20px; font-size: medium;">Edit Profile</a>
+                </th>
+
+            </tr>
+        </table>
+
+    </form>
+</nav>
+<br>
+
+
+<%
+        }
+
+    } else {
+        response.sendRedirect("Login_Page.jsp");
+    }
+%>
+
+

@@ -9,76 +9,99 @@
 <%@page import="proj.User"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
+
 <%
-    User user = new User();
-    String username = request.getParameter("username");
-    String email = request.getParameter("email");
-    String password = request.getParameter("password");
-    String job = request.getParameter("job");
-    String address = request.getParameter("address");
-    String birthday = request.getParameter("birthday");
+
     String credit = request.getParameter("credit");
-    int validLogin =0;
-    HashMap <String,String> userData = new HashMap<>();
-    if (username != null && !username.isEmpty()) {
-        userData.put("uname",username);
-        if (email != null && !email.isEmpty()) {
-userData.put("email",email);
+    String oldUsername = request.getParameter("oldUsername");
+    int validLogin = 0;
+    int updateStatus=0;
+    validLogin = proj.AccessHandler.checkStatus(session);
+
+    session.setAttribute("isCreditValid", "false");
+
+    if (oldUsername != null && !oldUsername.isEmpty()) {
+        session.setAttribute("oldUsername", oldUsername);
+
+    } else {
+        if (session.getAttribute("oldUsername") != null) {
+            oldUsername = session.getAttribute("oldUsername").toString();
+        } else {
+            if (validLogin != 0) {
+                response.sendRedirect("Admin_Page");
+            }
         }
-        if (password != null && !password.isEmpty()) {
-userData.put("password",password);
+    }
+
+    if (credit != null && !credit.isEmpty()) {
+
+        if (oldUsername != null && !oldUsername.isEmpty()) {
+            if (Double.parseDouble(credit) > 0) {
+
+                session.setAttribute("isCreditValid", "true");
+               
+
+            }
+
         }
-        if (job != null && !job.isEmpty()) {
-            userData.put("job",job);
-        }
-        if (address != null && !address.isEmpty()) {
-userData.put("adderss",address);
-        }
-        if (birthday != null && !birthday.isEmpty()) {
-userData.put("birthday",birthday);
-        }
-        if (credit != null && !credit.isEmpty()) {
-userData.put("cerditlimit",credit);
-        }
-        if(userData.size()!=0){
-            AccessHandler.editProfile(userData);
-            
-        }}
+
+    }
+    if(session.getAttribute("isCreditValid")!=null && session.getAttribute("isCreditValid").equals("true")){
+    updateStatus=AccessHandler.editProfile(credit, oldUsername);
+    }
+
 
 %>
 
-<%
-validLogin = proj.AccessHandler.checkStatus(session);
-if(validLogin==-1){
+<%    if (validLogin == -1) {
 %>
-<html>
-    <body>
-         
-        <h1>Change Profile</h1>
-        <form action="EditProfile.jsp" method="GET">
-            <label for="username">User Name</label>
-            <input type="text" name="username"><br>
-            <label for="email">E-mail</label>
-            <input type="text" name="email"><br>
-            <label for="password">Password</label>
-            <input type="text" name=password><br>
-            <label for="job">Job</label>
-            <input name="job" type="text"><br>
-            <label for="address">Address</label>
-            <input name="address" type="text"><br>
-            <label for="birthday">Birthday</label>
-            <input name="birthday" type="text"><br>
-            <label for="credit">Credit</label>
-            <input type="number" name="credit"><br>
-            <input type="Submit" value="Save Changes">
-        </form>
-                    
-    </body>
-</html>
+<head>
+    <style>
+        label{
+            color: brown;
+            width: 100px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<%@include file="Admin_Header.html" %>
+<h1>     Modify <%=oldUsername%>'s credit :</h1>
+<form action="EditProfile.jsp" method="GET" style="margin-left: 200px   ">
+    <label for="credit">Credit</label>
+    <input type="number" name="credit"><br><br>
+    <input type="Submit" value="Save Changes">
+</form>
 <%
-    
-}
-else{
-out.println("Unauthorized access");
-}
+    if (session.getAttribute("isCreditValid") != null && session.getAttribute("isCreditValid").toString().equals("false") && credit!=null) {
+%>
+<h3>Please enter a valid credit value (example: 1000.100,500) </h3>
+<%
+    }
+    if(updateStatus==1){
+%>
+<h3>Credit updated successfully for <%=oldUsername%> </h3>
+
+<%
+    }
+    %>
+ 
+
+<%
+    } else {
+
+        out.println("<html>\n"
+                + "    <body>\n"
+                + "        <style>\n"
+                + "            img{\n"
+                + "                width: 100%;\n"
+                + "                height: 100%;\n"
+                + "            }\n"
+                + "        </style>\n"
+                + "        <div>\n"
+                + "<img src=\"https://s3.envato.com/files/222779205/Access%20Denied%20590x332.jpg\" alt=\"\">\n"
+                + "        </div>\n"
+                + "    </body>\n"
+                + "</html>");
+
+    }
 %>

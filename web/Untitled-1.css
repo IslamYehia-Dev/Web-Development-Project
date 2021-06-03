@@ -1,0 +1,16 @@
+
+.options{
+    background-color: lightskyblue;
+    text-align: center;
+    font-size: xx-large;
+    
+}
+a{
+    color:red;
+    text-decoration:  none;
+}
+.footer{
+    bottom:0px;
+    position:absolute;
+    text-align: center;
+}
