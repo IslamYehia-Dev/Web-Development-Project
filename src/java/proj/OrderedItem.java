@@ -15,18 +15,21 @@ public class OrderedItem {
     public double price;
     public String name;
     public String catName;
+    public int item_ID ;
     public   OrderedItem()
     {
     quantity=0 ;
     price=0 ;
     name="";
     catName="";
+    item_ID=-1;
     }
-    public   OrderedItem(int qu , double pr , String na , String cna)
+    public   OrderedItem(int qu , double pr , String na , String cna,int id )
     {
     quantity=qu ;
     price=pr ;
     name=na;
     catName=cna;
+    item_ID =id ;
     }
 }

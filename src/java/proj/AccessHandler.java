@@ -5,28 +5,58 @@
  */
 package proj;
 
+import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
 import java.sql.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import javax.naming.spi.DirStateFactory;
 import javax.servlet.http.HttpSession;
+import org.bson.Document;
 
 /**
  *
  * @author eslam
  */
 public class AccessHandler {
+    public static void updateOrderState(int bno , int state) {
+         try {
+            PreparedStatement prSTMT = DataBaseConnector.connection.prepareStatement("update orders set state=? where billno=?");
+            prSTMT.setDouble(1, state);
+            prSTMT.setInt(2, bno);
+            prSTMT.executeUpdate();
+        } catch (SQLException ex) {
+            Logger.getLogger(AccessHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+    public static Product getProduct(int id) {
+        Product prod = new Product();
+        try {
+
+            ResultSet rs;
+            PreparedStatement stm;
+            stm = DataBaseConnector.connection.prepareStatement("select * from item , category where category_id = cat_id and item_id= '" + id + "' ");
+            rs = stm.executeQuery();
+            if (rs.next()) {
+                prod = new Product(rs.getInt("item_id"), rs.getString("name"), rs.getInt("quantity"), rs.getDouble("price"), rs.getString("category_id"), rs.getString("img"));
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(AccessHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return prod;
+
+    }
 
     public static double getOrderTotal(int billno) {
         double tot = 0;
 
         try {
             Statement newstmt = DataBaseConnector.connection.createStatement();
-            ResultSet rsset = newstmt.executeQuery("select c.cat_name,i.name,d.quantity,i.price from  order_details d , item i , category c  where c.category_id=i.cat_id and   d.billno= " + billno + "  and d.item_id = i.item_id");
+            ResultSet rsset = newstmt.executeQuery("select d.quantity,i.price from  order_details d , item i   where    d.billno= " + billno + "  and d.item_id = i.item_id");
             while (rsset.next()) {
-                tot += rsset.getInt(3) * rsset.getDouble(4);
+                tot += rsset.getInt(1) * rsset.getDouble(2);
 
             }
         } catch (SQLException ex) {
@@ -41,9 +71,9 @@ public class AccessHandler {
 
         try {
             Statement newstmt = DataBaseConnector.connection.createStatement();
-            ResultSet rsset = newstmt.executeQuery("select c.cat_name,i.name,d.quantity,i.price from  order_details d , item i , category c  where c.category_id=i.cat_id and   d.billno= " + billno + "  and d.item_id = i.item_id");
+            ResultSet rsset = newstmt.executeQuery("select c.cat_name,i.name,d.quantity,i.price , d.item_id from  order_details d , item i , category c  where c.category_id=i.cat_id and   d.billno= " + billno + "  and d.item_id = i.item_id");
             while (rsset.next()) {
-                orderDetails.add(new OrderedItem(rsset.getInt(3), rsset.getDouble(4), rsset.getString(2), rsset.getString(1)));
+                orderDetails.add(new OrderedItem(rsset.getInt(3), rsset.getDouble(4), rsset.getString(2), rsset.getString(1), rsset.getInt(5)));
 
             }
         } catch (SQLException ex) {
@@ -57,9 +87,24 @@ public class AccessHandler {
         List<Order> allOrders = new ArrayList<>();
         try {
             Statement stmt = DataBaseConnector.connection.createStatement();
-            ResultSet rs = stmt.executeQuery("select  o.billno , u.uname , o.datee from orders  o , users u  where u.id=o.user_id ");
+            ResultSet rs = stmt.executeQuery("select  o.billno , u.uname , o.datee , o.state  from orders  o , users u  where u.id=o.user_id ");
             while (rs.next()) {
-                allOrders.add(new Order(rs.getInt(1), rs.getString(3), rs.getString(2), getOrderTotal(rs.getInt(1)), getOrderDetails(rs.getInt(1))));
+                allOrders.add(new Order(rs.getInt(1), rs.getString(3), rs.getString(2), getOrderTotal(rs.getInt(1)), getOrderDetails(rs.getInt(1)),rs.getInt(4)));
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(AccessHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        return allOrders;
+    }
+
+    public static List<Order> getOrders(int userid) {
+        List<Order> allOrders = new ArrayList<>();
+        try {
+            Statement stmt = DataBaseConnector.connection.createStatement();
+            ResultSet rs = stmt.executeQuery("select  o.billno , u.uname , o.datee , o.state from orders  o , users u  where u.id=o.user_id and u.id='" + userid + "'");
+            while (rs.next()) {
+                allOrders.add(new Order(rs.getInt(1), rs.getString(3), rs.getString(2), getOrderTotal(rs.getInt(1)), getOrderDetails(rs.getInt(1)),rs.getInt(4)));
             }
         } catch (SQLException ex) {
             Logger.getLogger(AccessHandler.class.getName()).log(Level.SEVERE, null, ex);
@@ -233,6 +278,27 @@ public class AccessHandler {
         return prods;
     }
 
+    public static List<Product> getProductsByCat(int category) {
+        List<Product> prods = new ArrayList<>();
+        try {
+
+            ResultSet rs;
+            PreparedStatement stm;
+            stm = DataBaseConnector.connection.prepareStatement("select * from item , category where category_id = ? and cat_id=?");
+            stm.setInt(1, category);
+            stm.setInt(2, category);
+            rs = stm.executeQuery();
+            while (rs.next()) {
+                prods.add(new Product(rs.getInt("item_id"), rs.getString("name"), rs.getInt("quantity"), rs.getDouble("price"), rs.getString("category_id"), rs.getString("img")));
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(AccessHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return prods;
+
+    }
+
     public static List<Product> getProducts() {
         List<Product> prods = new ArrayList<>();
         try {
@@ -386,7 +452,6 @@ public class AccessHandler {
 //
 //        return myHash;
 //    }
-
     public static Vector<User> listUsers() {
         ResultSet result;
         Vector<User> users = new Vector<>();
@@ -428,6 +493,27 @@ public class AccessHandler {
         return categories;
     }
 
+    public static List<Product> searchProducts(String productName) {
+        List<Product> prods = new ArrayList<>();
+        try {
+
+            ResultSet rs;
+            PreparedStatement stm;
+            String searchWord = "%" + productName.toLowerCase() + "%";
+            stm = DataBaseConnector.connection.prepareStatement("select * from item where LOWER(name) like ?");
+            stm.setString(1, searchWord);
+            rs = stm.executeQuery();
+            while (rs.next()) {
+                prods.add(new Product(rs.getInt("item_id"), rs.getString("name"), rs.getInt("quantity"), rs.getDouble("price"), rs.getString("cat_id"), rs.getString("img")));
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(AccessHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return prods;
+
+    }
+
     public static int deleteUser(String userName) {
 
         ResultSet result;
@@ -442,37 +528,57 @@ public class AccessHandler {
         return deleteStatus;
     }
 
-    public static int editProfile(HashMap<String, String> userData) {
+    public static int editProfile(String credit, String oldUsername) {
         ResultSet result;
         int updateStatus = 0;
+        String username = "";
+        int update = 0;
+
+        try {
+
+            PreparedStatement pst = DataBaseConnector.connection.prepareStatement("update users set creditlimit = ? where  uname = ?");
+
+            pst.setDouble(1, Double.parseDouble(credit));
+
+            pst.setString(2, oldUsername);
+
+            update = pst.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return update;
+
+    }
+
+    public static int editUserProfile(HashMap<String, String> userData, String userName) {
+        ResultSet result;
         String username = "";
         Set keys = userData.keySet();
         String[] fields = new String[keys.size()];
         keys.toArray(fields);
+        int update = 0;
         try {
             for (int i = 0; i < fields.length; i++) {
-                PreparedStatement pst = DataBaseConnector.connection.prepareStatement("update users set " + fields[i] + " = ? where " + fields[i] + " = ?");
+                PreparedStatement pst = DataBaseConnector.connection.prepareStatement("update users set " + fields[i] + " = ? where uname = ?");
 
-                if (fields[i].equals("creditlimit")) {
-                    pst.setDouble(1, Double.parseDouble(userData.get(fields[i])));
-                } else {
-                    pst.setString(1, userData.get(fields[i]));
-                }
-                pst.setString(2, "ahmed");
+                pst.setString(1, userData.get(fields[i]));
 
-                int update = pst.executeUpdate();
+                pst.setString(2, userName);
+
+                update = pst.executeUpdate();
 
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return 0;
+        return update;
 
     }
 
     public static int checkStatus(HttpSession session) {
-        if (session.getAttribute("usertype") != null) {
+        if (session != null && session.getAttribute("usertype") != null) {
             if (session.getAttribute("usertype").equals("user")) {
                 return 1;
             } else {
@@ -482,6 +588,46 @@ public class AccessHandler {
             return 0;
         }
 
+    }
+
+    public static Vector<String> getReviews(int productId) {
+        FindIterable<Document> doc;
+        Vector<String> reviews = new Vector<String>();
+        String userName = "";
+        String userReview = "";
+        String reviewDate = "";
+
+        MongoCollection<Document> coll = DataBaseConnector.database.getCollection("feedbacks");
+        doc = coll.find(new Document("prod_id", productId));
+        if (doc != null) {
+            for (Document document : doc) {
+                userName = document.get("user_name").toString()+"-"+document.get("review_date").toString();
+                reviews.add(userName);
+                userReview = document.get("review").toString();
+                reviews.add(userReview);
+            }
+        }
+        return reviews;
+
+    }
+
+    public static Product getProductDetails(String productName) {
+        ResultSet result;
+        Product viewedProd = new Product();
+        try {
+
+            PreparedStatement pst = DataBaseConnector.connection.prepareStatement("select price,img from item where name = ?");
+            pst.setString(1, productName);
+            result = pst.executeQuery();
+            while (result.next()) {
+               
+               viewedProd.price=result.getInt("price");
+               viewedProd.img=result.getString("img");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return viewedProd;
     }
 
 }

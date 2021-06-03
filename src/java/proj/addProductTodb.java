@@ -27,7 +27,7 @@ public class addProductTodb extends HttpServlet {
         newprod.price = Double.parseDouble(req.getParameter("price"));
         newprod.cat_no = Integer.parseInt(req.getParameter("category"));
         AccessHandler.addProduct(newprod);
-                 resp.sendRedirect("/OnlineOrder/addProduct.jsp");
+        resp.sendRedirect("/OnlineOrder/addProduct.jsp");
 
     }
 
