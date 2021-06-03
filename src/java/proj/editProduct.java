@@ -26,13 +26,17 @@ public class editProduct extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 Product newprod = new Product();
-        
+        try{
         newprod.id = Integer.parseInt(req.getParameter("itemid"));
         newprod.quantity = Integer.parseInt(req.getParameter("quantity"));
         newprod.price = Double.parseDouble(req.getParameter("price"));
         newprod.name = req.getParameter("name");
         AccessHandler.editProduct(newprod);
+        resp.sendRedirect("/OnlineOrder/editprods.jsp");}
+		catch(Exception e)
+		{
         resp.sendRedirect("/OnlineOrder/editprods.jsp");
+                }
     }
 
 

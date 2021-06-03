@@ -16,19 +16,12 @@ import javax.servlet.http.HttpServletResponse;
  *
  * @author eslam
  */
-public class addProductTodb extends HttpServlet {
+public class logout extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Product newprod = new Product();
-        newprod.name = req.getParameter("name");
-        newprod.img = req.getParameter("img");
-        newprod.quantity = Integer.parseInt(req.getParameter("quantity"));
-        newprod.price = Double.parseDouble(req.getParameter("price"));
-        newprod.cat_no = Integer.parseInt(req.getParameter("category"));
-        AccessHandler.addProduct(newprod);
-        resp.sendRedirect("/OnlineOrder/addProduct.jsp");
-
+        req.getSession().invalidate();
+        resp.sendRedirect("Login_Page.jsp");
     }
 
   

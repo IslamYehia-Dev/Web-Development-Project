@@ -18,6 +18,7 @@ public class Order {
     public String uname;
     public double total ;
     public List<OrderedItem> orderItems;
+    public int orderState ;
     public Order()
     {
     billNO=-1;
@@ -25,15 +26,17 @@ public class Order {
     uname="";
     total=0;
     orderItems=new ArrayList<>();
+    orderState = 0 ;
     
     }
-    public Order(int b , String d , String u , double t, List<OrderedItem> oi)
+    public Order(int b , String d , String u , double t, List<OrderedItem> oi , int os)
     {
     billNO=b;
     date=d;
     uname=u;
     total=t;
     orderItems=oi;
+    orderState = os ;
     
     }
 }
