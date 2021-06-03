@@ -24,25 +24,45 @@ public class addtocart extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
- 
         int itemid = Integer.parseInt(req.getParameter("itemid"));
-        PrintWriter out = resp.getWriter();
         HttpSession hSes = req.getSession();
+        
+        
         List<Integer> productsCart = new ArrayList<>();
-        if(hSes.getAttribute("cart")!=null)
-        {
-             productsCart = (List<Integer>)hSes.getValue("cart");
-             productsCart.add(itemid);
-             hSes.setAttribute("cart", productsCart);
+        List<Product> prods = AccessHandler.getProducts();
+        List<Product> curProds = new ArrayList<>();
+        if (hSes.getAttribute("cart") != null) {
+            productsCart = (List<Integer>) hSes.getAttribute("cart");
+            curProds = AccessHandler.getProducts(productsCart);
         }
-        else
-        {
-            productsCart.add(itemid);
+        for (int i = 0; i < curProds.size(); i++) {
+            for (int j = 0; j < prods.size(); j++) {
+                if (curProds.get(i).id==prods.get(j).id) {
+                    prods.get(j).orderedQuantity =curProds.get(i).orderedQuantity;
+                }
+                else 
+                    prods.get(j).orderedQuantity = 0 ;
+            }
+        }
+        boolean available = true;
+        for (int i = 0; i < prods.size(); i++) {
+            if (itemid == prods.get(i).id) {
+                if (prods.get(i).orderedQuantity >= prods.get(i).quantity) {
+                    available = false;
+                    break;
+                }
+            }
+        }
+        if (available) {
+                productsCart.add(itemid);
+            }
             hSes.setAttribute("cart", productsCart);
-        }
-         resp.sendRedirect("/OnlineOrder/newjsp.jsp");
-    
+            if(hSes.getAttribute("cat")!=null){
+            String category = hSes.getAttribute("cat").toString();
+            resp.sendRedirect("/OnlineOrder/viewitem.jsp?cat="+category);
+            }else{
+        resp.sendRedirect("/OnlineOrder/viewitem.jsp");
+            }
     }
 
- 
 }

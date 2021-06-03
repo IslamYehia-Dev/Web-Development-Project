@@ -5,6 +5,9 @@
  */
 package proj;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author eslam
@@ -19,7 +22,8 @@ public class User {
     public String job;
     public double credit_Limit;
     public String address;
-    public User()
+    public List<String> myInts = new ArrayList<>();
+    public User()   
     {
     id =0;
     password ="";
